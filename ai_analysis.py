@@ -1,22 +1,22 @@
-
-import openai
+from openai import OpenAI
 import os
 
-openai.api_key = os.getenv("OPENAI_API_KEY")
+client = OpenAI()
 
 def analyze_competitors(listings):
-    input_text = "".join([f"Title: {x['title']}, Price: {x['price']}\n" for x in listings])
-    prompt = f"""
-    Here is a list of Etsy listings:
-    {input_text}
+    prompt = f"""You are an Etsy product analyst. Analyze the following listings and provide insights on what makes them successful (e.g. pricing, keywords, titles, images, etc.):
+
+{listings}
+
+Give a summary of common patterns and tips to compete with them."""
     
-    Please identify:
-    1. What makes the top ones successful
-    2. Pricing trends
-    3. Suggest a better listing title and strategy
-    """
-    response = openai.ChatCompletion.create(
+    response = client.chat.completions.create(
         model="gpt-3.5-turbo",
-        messages=[{"role": "user", "content": prompt}]
+        messages=[
+            {"role": "system", "content": "You are an expert Etsy SEO analyst."},
+            {"role": "user", "content": prompt}
+        ]
     )
-    return response['choices'][0]['message']['content']
+
+    reply = response.choices[0].message.content
+    return reply
