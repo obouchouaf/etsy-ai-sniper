@@ -1,20 +1,11 @@
-
 import requests
 from bs4 import BeautifulSoup
 
-def scrape_etsy(keyword):
-    query = keyword.replace(' ', '+')
-    url = f"https://www.etsy.com/search?q={query}"
-    headers = {"User-Agent": "Mozilla/5.0"}
-    r = requests.get(url, headers=headers)
-    soup = BeautifulSoup(r.text, "html.parser")
-    results = []
-    for item in soup.select("li.wt-list-unstyled")[:5]:
-        title = item.select_one("h3")
-        price = item.select_one("span.currency-value")
-        if title and price:
-            results.append({
-                "title": title.get_text(strip=True),
-                "price": price.get_text(strip=True)
-            })
-    return results
+def get_etsy_listings(query):
+    url = f"https://www.etsy.com/search?q={query.replace(' ', '+')}"
+    headers = {'User-Agent': 'Mozilla/5.0'}
+    response = requests.get(url, headers=headers)
+    soup = BeautifulSoup(response.text, 'html.parser')
+    items = soup.find_all('li', {'class': 'wt-list-unstyled'})[:5]
+    listings = [item.get_text(strip=True) for item in items if item]
+    return listings

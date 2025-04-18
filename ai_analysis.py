@@ -1,22 +1,16 @@
-from openai import OpenAI
+import openai
 import os
 
-client = OpenAI()
+# Load API key from environment variable (recommended)
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 def analyze_competitors(listings):
-    prompt = f"""You are an Etsy product analyst. Analyze the following listings and provide insights on what makes them successful (e.g. pricing, keywords, titles, images, etc.):
-
-{listings}
-
-Give a summary of common patterns and tips to compete with them."""
-    
-    response = client.chat.completions.create(
+    prompt = f"Analyze these Etsy listings and provide insights:\n{listings}"
+    response = openai.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[
-            {"role": "system", "content": "You are an expert Etsy SEO analyst."},
+            {"role": "system", "content": "You are a data analyst specialized in e-commerce trends."},
             {"role": "user", "content": prompt}
         ]
     )
-
-    reply = response.choices[0].message.content
-    return reply
+    return response.choices[0].message.content
